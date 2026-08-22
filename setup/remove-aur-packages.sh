@@ -19,4 +19,4 @@ do
 done
 
 
-yay -Rns - < "$REPO_ROOT/packages/remove-aur.txt"
+yay -Rns --noconfirm - < "$REPO_ROOT/packages/remove-aur.txt"

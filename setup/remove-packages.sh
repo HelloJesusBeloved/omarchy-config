@@ -19,4 +19,4 @@ do
 done
 
 
-sudo pacman -Rns - < "$REPO_ROOT/packages/remove.txt"
+sudo pacman -Rns --noconfirm - < "$REPO_ROOT/packages/remove.txt"

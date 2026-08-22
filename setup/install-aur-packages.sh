@@ -19,4 +19,4 @@ do
 done
 
 
-yay -S --needed - < "$REPO_ROOT/packages/install-aur.txt"
+yay -S --needed --noconfirm - < "$REPO_ROOT/packages/install-aur.txt"

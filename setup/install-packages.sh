@@ -19,4 +19,4 @@ do
 done
 
 
-sudo pacman -Syu --needed - < "$REPO_ROOT/packages/install.txt"
+sudo pacman -Syu --needed --noconfirm - < "$REPO_ROOT/packages/install.txt"
