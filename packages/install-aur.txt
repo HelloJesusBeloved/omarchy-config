@@ -1,0 +1,3 @@
+glide-browser-bin
+brave-bin
+bluebubbles-bin
