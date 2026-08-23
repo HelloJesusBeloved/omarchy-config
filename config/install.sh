@@ -51,25 +51,9 @@ else
 
 fi
 
-if mv $GLIDE_TS $LOCAL_GLIDE_TS
+if cp $GLIDE_TS $LOCAL_GLIDE_TS
 then
     echo "Glide Configuration File Updated Successfully"
 else
-    echo "Failed to Update (mv) Glide Configuration File"
+    echo "Failed to Update (cp) Glide Configuration File"
 fi
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
