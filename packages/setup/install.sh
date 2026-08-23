@@ -61,8 +61,8 @@ usage() {
     echo "  -p        Install packages from install.txt"
     echo "  -a        Install AUR packages from install-aur.txt"
     echo "  -m        Install MEGAcmd"
-    echo "  --all     Install packages, AUR packages, and MEGAcmd"
     echo "  --help    Show this help message"
+    echo "  no flag   Install packages, AUR packages, and MEGAcmd"
 }
 
 
@@ -76,7 +76,7 @@ case "$1" in
     -m)
         install_mega
         ;;
-    --all)
+    "")
         install_all
         ;;
     --help)

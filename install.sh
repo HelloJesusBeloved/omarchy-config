@@ -15,8 +15,8 @@ do
 done
 
 
-INSTALL_SCRIPTS(
-    "$REPO_ROOT/packages/setup/install.sh" 
+INSTALL_SCRIPTS=(
+    "$REPO_ROOT/packages/setup/install.sh"
     "$REPO_ROOT/config/install.sh"
 )
 

@@ -22,6 +22,7 @@ do
     if ! grep -Fxq "$alias" "$HOME/.bashrc"
     then
         echo "$alias" >> "$HOME/.bashrc"
+        echo "added $alias to .bashrc"
     fi
 done
 
