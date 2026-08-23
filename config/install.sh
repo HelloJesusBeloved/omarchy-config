@@ -11,8 +11,8 @@ set -e
 ALIASES=(
     "alias vim='nvim'"
 
-    "alias mega='mega-cmd"
-    "alias megas='mega-sync"
+    "alias mega='mega-cmd'"
+    "alias megas='mega-sync'"
 )
 
 
