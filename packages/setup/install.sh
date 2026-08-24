@@ -43,15 +43,41 @@ install_mega() {
         https://mega.nz/linux/repo/Arch_Extra/x86_64/megacmd-x86_64.pkg.tar.zst
 
     sudo pacman -U --noconfirm /tmp/megacmd.pkg.tar.zst
+    sudo pacman -Sy
 
     rm -f /tmp/megacmd.pkg.tar.zst
+}
+
+install_tailscale() {
+    if command -v tailscale &>/dev/null; then
+        echo "Tailscale is already installed."
+        return
+    fi
+
+    omarchy install service tailscale
+}
+
+
+install_signal() {
+    if command -v signal-desktop &>/dev/null; then
+        echo "Signal is already installed."
+        return
+    fi
+
+    omarchy install service signal
+}
+
+install_other() {
+    install_mega
+    install_tailscale
+    install_signal
 }
 
 install_all() {
     install_packages
     install_aur_packages
-    install_mega
-}
+    install_other
+    }
 
 
 usage() {
@@ -60,7 +86,7 @@ usage() {
     echo "Options:"
     echo "  -p        Install packages from install.txt"
     echo "  -a        Install AUR packages from install-aur.txt"
-    echo "  -m        Install MEGAcmd"
+    echo "  -o        Install MEGAcmd, Signal, and Tailscale"
     echo "  --help    Show this help message"
     echo "  no flag   Install packages, AUR packages, and MEGAcmd"
 }
@@ -73,8 +99,8 @@ case "$1" in
     -a)
         install_aur_packages
         ;;
-    -m)
-        install_mega
+    -o)
+        install_other
         ;;
     "")
         install_all
