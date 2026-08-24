@@ -15,16 +15,30 @@ done
 
 
 remove_packages() {
+    if [[ ! -s "$REPO_ROOT/packages/lists/remove.txt" ]]; then
+        echo "No packages to remove."
+        return
+    fi  
+
     sudo pacman -Rns --noconfirm \
         - < "$REPO_ROOT/packages/lists/remove.txt"
 }
 
 
 remove_aur_packages() {
+    if [[ ! -s "$REPO_ROOT/packages/lists/remove-aur.txt" ]]; then
+        echo "No AUR packages to remove."
+        return
+    fi  
+
     yay -Rns --noconfirm \
         - < "$REPO_ROOT/packages/lists/remove-aur.txt"
 }
 
+remove_all() {
+    remove_packages
+    remove_aur_packages
+}
 
 usage() {
     echo "Usage: $0 [OPTION]"
@@ -42,6 +56,9 @@ case "$1" in
         ;;
     -a)
         remove_aur_packages
+        ;;
+    "")
+        remove_all
         ;;
     --help)
         usage
