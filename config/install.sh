@@ -4,9 +4,22 @@
 set -e 
 
 
+REPO_ROOT_DEPTH=1
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+REPO_ROOT="$SCRIPT_DIR"
+
+for ((i = 0; i < REPO_ROOT_DEPTH; i++))
+do
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+done
+
+
 #NOTE: This is only what I am able to configure simply via bash script, does not neccessrily include all the config from the README.md.
 #
 #Currently configures: 
+
 
 #1. Aliases
 ALIASES=(
@@ -56,4 +69,18 @@ then
     echo "Glide Configuration File Updated Successfully"
 else
     echo "Failed to Update (cp) Glide Configuration File"
+    echo "Please make sure that you have initialized your glide config from inside Glide Browser"
+fi
+
+
+#3 XCompose
+XCOMPOSE_REPO_LOCATION="$REPO_ROOT/config/XCompose"
+XCOMPOSE_LOCAL_LOCATION="$HOME/.XCompose"
+
+if cp $XCOMPOSE_REPO_LOCATION $XCOMPOSE_LOCAL_LOCATION
+then
+    echo "XCompose successfully installed to $XCOMPOSE_LOCAL_LOCATION"
+    omarchy-restart-xcompose
+else
+    echo "XCompose failed to install (cp)"
 fi
