@@ -15,26 +15,38 @@ done
 
 
 remove_packages() {
-    if [[ ! -s "$REPO_ROOT/packages/lists/remove.txt" ]]; then
+    local packages
+
+    packages=$(
+        pacman -Qq |
+        grep -Fx -f "$REPO_ROOT/packages/lists/remove.txt" || true
+    )
+
+    if [[ -z "$packages" ]]; then
         echo "No packages to remove."
         return
-    fi  
+    fi
 
-    sudo pacman -Rns --noconfirm \
-        - < "$REPO_ROOT/packages/lists/remove.txt"
+    printf '%s\n' "$packages" |
+        sudo pacman -Rns --noconfirm -
 }
-
 
 remove_aur_packages() {
-    if [[ ! -s "$REPO_ROOT/packages/lists/remove-aur.txt" ]]; then
+    local packages
+
+    packages=$(
+        pacman -Qqm |
+        grep -Fx -f "$REPO_ROOT/packages/lists/remove-aur.txt" || true
+    )
+
+    if [[ -z "$packages" ]]; then
         echo "No AUR packages to remove."
         return
-    fi  
+    fi
 
-    yay -Rns --noconfirm \
-        - < "$REPO_ROOT/packages/lists/remove-aur.txt"
+    printf '%s\n' "$packages" |
+        yay -Rns --noconfirm -
 }
-
 remove_all() {
     remove_packages
     remove_aur_packages
@@ -47,6 +59,7 @@ usage() {
     echo "  -p        Remove packages from remove.txt"
     echo "  -a        Remove AUR packages from remove-aur.txt"
     echo "  --help    Show this help message"
+    echo "  no flag   Remove all"
 }
 
 
