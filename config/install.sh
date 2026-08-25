@@ -45,7 +45,7 @@ source $HOME/.bashrc
 #2. Glide.ts
 GLIDE_REPO_LOCATION="$HOME/Code/Projects"
 GLIDE_REPO="$HOME/Code/Projects/glide-config"
-GLIDE_TS="$HOME/Code/Projects/glide-config/glide.ts"
+REPO_GLIDE_TS="$HOME/Code/Projects/glide-config/glide.ts"
 
 LOCAL_GLIDE_TS="$HOME/.config/glide/glide.ts"
 
@@ -64,12 +64,17 @@ else
 
 fi
 
-if cp $GLIDE_TS $LOCAL_GLIDE_TS
-then
-    echo "Glide Configuration File Updated Successfully"
+#If current local glide.ts is different that the freshly pulled repo glide.ts then
+if ! cmp -s "$LOCAL_GLIDE_TS" "$REPO_GLIDE_TS"; then
+    if cp $REPO_GLIDE_TS $LOCAL_GLIDE_TS
+    then
+        echo "Glide Configuration File Updated Successfully"
+    else
+        echo "Failed to Update (cp) Glide Configuration File"
+        echo "Please make sure that you have initialized your glide config from inside Glide Browser"
+    fi
 else
-    echo "Failed to Update (cp) Glide Configuration File"
-    echo "Please make sure that you have initialized your glide config from inside Glide Browser"
+    echo "Glide Configuration File is already up to date"
 fi
 
 
