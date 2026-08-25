@@ -6,4 +6,3 @@ Google Photos
 HEY
 X
 Zoom
-#Note I do not know how to remove these without manually using the Remove menu

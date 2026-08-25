@@ -47,9 +47,30 @@ remove_aur_packages() {
     printf '%s\n' "$packages" |
         yay -Rns --noconfirm -
 }
+
+remove_web_apps() {
+    local app
+    local found=0
+
+    while IFS= read -r app
+    do
+        [[ -z "$app" ]] && continue
+
+        if [[ -f "$HOME/.local/share/applications/$app.desktop" ]]; then
+            found=1
+            omarchy-webapp-remove "$app"
+        fi
+    done < "$REPO_ROOT/packages/lists/remove-web-app.txt"
+
+    if [[ $found -eq 0 ]]; then
+        echo "No web apps to remove."
+    fi
+}
+
 remove_all() {
     remove_packages
     remove_aur_packages
+    remove_web_apps
 }
 
 usage() {
