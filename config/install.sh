@@ -50,7 +50,6 @@ REPO_GLIDE_TS="$HOME/Code/Projects/glide-config/glide.ts"
 LOCAL_GLIDE_TS="$HOME/.config/glide/glide.ts"
 
 mkdir -p $GLIDE_REPO_LOCATION
-cd $GLIDE_REPO_LOCATION
 
 if [ -d "$GLIDE_REPO" ]; then
 
@@ -63,6 +62,7 @@ if [ -d "$GLIDE_REPO" ]; then
 
 else
 
+    cd $GLIDE_REPO_LOCATION
     git clone https://git.nerdvpn.de/HelloJesusBeloved/glide-config
 
 fi
