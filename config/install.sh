@@ -109,13 +109,93 @@ else
 fi
 
 
-#4 Key Binds
+# 4. Key Binds
 BINDINGS_REPO_LOCATION="$REPO_ROOT/config/bindings.lua"
 BINDINGS_LOCAL_LOCATION="$HOME/.config/hypr/bindings.lua"
 
-if cp $BINDINGS_REPO_LOCATION $BINDINGS_LOCAL_LOCATION
-then
-    echo "Bindings.lua file successfully installed to $BINDINGS_LOCAL_LOCATION"
+if [[ ! -f "$BINDINGS_LOCAL_LOCATION" ]]; then
+    echo "Local bindings.lua does not exist. Installing from repo..."
+    cp "$BINDINGS_REPO_LOCATION" "$BINDINGS_LOCAL_LOCATION" &&
+        echo "Bindings.lua file successfully installed to $BINDINGS_LOCAL_LOCATION"
 else
-    echo "Bindings.lua file failed to install (cp)"
+    # Extract everything before the first --Custom line.
+    REPO_OMARCHY=$(sed '/^--Custom$/q' "$BINDINGS_REPO_LOCATION" | sed '$d')
+    LOCAL_OMARCHY=$(sed '/^--Custom$/q' "$BINDINGS_LOCAL_LOCATION" | sed '$d')
+
+    if [[ "$REPO_OMARCHY" == "$LOCAL_OMARCHY" ]]; then
+        echo "Omarchy-managed bindings.lua section is up to date."
+
+        if cp "$BINDINGS_REPO_LOCATION" "$BINDINGS_LOCAL_LOCATION"; then
+            echo "Bindings.lua file successfully installed to $BINDINGS_LOCAL_LOCATION"
+        else
+            echo "Bindings.lua file failed to install (cp)"
+        fi
+    else
+        echo "WARNING: The Omarchy-managed section of bindings.lua has changed."
+        echo
+        echo "Differences in the Omarchy-managed section:"
+        echo
+        diff -u \
+            <(printf '%s\n' "$LOCAL_OMARCHY") \
+            <(printf '%s\n' "$REPO_OMARCHY")
+        echo
+
+        while true; do
+            read -rp "Merge Omarchy changes into your custom bindings? [Y/n/o] " CONFIRM
+
+            case "$CONFIRM" in
+                ""|[Yy])
+                    # Keep the updated Omarchy-managed section from the local
+                    # file and replace everything from --Custom onward with
+                    # the repo version.
+                    TEMP_FILE=$(mktemp)
+
+                    if {
+                        sed '/^--Custom$/q' "$BINDINGS_LOCAL_LOCATION" | sed '$d'
+                        sed -n '/^--Custom$/,$p' "$BINDINGS_REPO_LOCATION"
+                    } > "$TEMP_FILE" &&
+                    cp "$TEMP_FILE" "$BINDINGS_LOCAL_LOCATION"
+                    then
+                        echo "Bindings.lua merged successfully."
+                    else
+                        echo "Bindings.lua merge failed."
+                        rm -f "$TEMP_FILE"
+                        exit 1
+                    fi
+
+                    rm -f "$TEMP_FILE"
+                    break
+                    ;;
+
+                [Oo])
+                    if cp "$BINDINGS_REPO_LOCATION" "$BINDINGS_LOCAL_LOCATION"; then
+                        echo "Bindings.lua overwritten with the repo version."
+                    else
+                        echo "Bindings.lua file failed to install (cp)"
+                    fi
+                    break
+                    ;;
+
+                [Nn])
+                    echo "Bindings.lua installation cancelled."
+                    break
+                    ;;
+
+                   *)
+                    echo "Invalid option. Enter = merge, O = overwrite, N = cancel."
+                    echo
+                    echo "Options:"
+                    echo "  Enter / Y  Merge:"
+                    echo "              Keep Omarchy's updated section from the local file"
+                    echo "              and use your custom bindings from the repo."
+                    echo "  O          Overwrite:"
+                    echo "              Replace the entire local file with the repo version."
+                    echo "  N          Cancel:"
+                    echo "              Make no changes to the local file."
+                    echo "  *          Show this help."
+                    echo
+                    ;;
+            esac
+        done
+    fi
 fi
