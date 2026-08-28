@@ -93,3 +93,15 @@ then
 else
     echo "XCompose failed to install (cp)"
 fi
+
+
+#4 Key Binds
+BINDINGS_REPO_LOCATION="$REPO_ROOT/config/bindings.lua"
+BINDINGS_LOCAL_LOCATION="$HOME/.config/hypr/bindings.lua"
+
+if cp $BINDINGS_REPO_LOCATION $BINDINGS_LOCAL_LOCATION
+then
+    echo "Bindings.lua file successfully installed to $BINDINGS_LOCAL_LOCATION"
+else
+    echo "Bindings.lua file failed to install (cp)"
+fi
