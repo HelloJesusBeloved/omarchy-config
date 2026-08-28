@@ -55,6 +55,9 @@ cd $GLIDE_REPO_LOCATION
 if [ -d "$GLIDE_REPO" ]; then
 
     cd $GLIDE_REPO
+
+    echo "Checking for Glide.ts remote repo changes..."
+
     git fetch
     git pull
 
@@ -75,6 +78,7 @@ if ! cmp -s "$LOCAL_GLIDE_TS" "$REPO_GLIDE_TS"; then
     fi
 else
     echo "Glide Configuration File is already up to date"
+    echo
 fi
 
 
