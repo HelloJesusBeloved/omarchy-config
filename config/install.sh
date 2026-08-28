@@ -53,18 +53,32 @@ mkdir -p $GLIDE_REPO_LOCATION
 
 if [ -d "$GLIDE_REPO" ]; then
 
-    cd $GLIDE_REPO
+  if cd $GLIDE_REPO
+  then
 
     echo "Checking for Glide.ts remote repo changes..."
 
     git fetch
     git pull
 
+  else 
+
+    echo "Failed to cd to $GLIDE_REPO, could not pull glide.ts"
+
+  fi
+
 else
 
-    cd $GLIDE_REPO_LOCATION
+  if cd $GLIDE_REPO_LOCATION
+  then
+
     git clone https://git.nerdvpn.de/HelloJesusBeloved/glide-config
 
+  else
+
+    echo "Failed to cd to $GLIDE_REPO_LOCATION, could not clone glide.ts"
+
+  fi
 fi
 
 #If current local glide.ts is different that the freshly pulled repo glide.ts then
