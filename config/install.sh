@@ -86,9 +86,11 @@ if ! cmp -s "$LOCAL_GLIDE_TS" "$REPO_GLIDE_TS"; then
     if cp $REPO_GLIDE_TS $LOCAL_GLIDE_TS
     then
         echo "Glide Configuration File Updated Successfully"
+        echo
     else
         echo "Failed to Update (cp) Glide Configuration File"
         echo "Please make sure that you have initialized your glide config from inside Glide Browser"
+        echo
     fi
 else
     echo "Glide Configuration File is already up to date"
@@ -103,9 +105,11 @@ XCOMPOSE_LOCAL_LOCATION="$HOME/.XCompose"
 if cp $XCOMPOSE_REPO_LOCATION $XCOMPOSE_LOCAL_LOCATION
 then
     echo "XCompose successfully installed to $XCOMPOSE_LOCAL_LOCATION"
+    echo
     omarchy-restart-xcompose
 else
     echo "XCompose failed to install (cp)"
+    echo
 fi
 
 
@@ -117,6 +121,7 @@ if [[ ! -f "$BINDINGS_LOCAL_LOCATION" ]]; then
     echo "Local bindings.lua does not exist. Installing from repo..."
     cp "$BINDINGS_REPO_LOCATION" "$BINDINGS_LOCAL_LOCATION" &&
         echo "Bindings.lua file successfully installed to $BINDINGS_LOCAL_LOCATION"
+        echo
 else
     # Extract everything before the first --Custom line.
     REPO_OMARCHY=$(sed '/^--Custom$/q' "$BINDINGS_REPO_LOCATION" | sed '$d')
@@ -127,12 +132,13 @@ else
 
         if cp "$BINDINGS_REPO_LOCATION" "$BINDINGS_LOCAL_LOCATION"; then
             echo "Bindings.lua file successfully installed to $BINDINGS_LOCAL_LOCATION"
+            echo
         else
             echo "Bindings.lua file failed to install (cp)"
+            echo
         fi
     else
         echo "WARNING: The Omarchy-managed section of bindings.lua has changed."
-        echo
         echo "Differences in the Omarchy-managed section:"
         echo
         diff -u \
@@ -141,7 +147,7 @@ else
         echo
 
         while true; do
-            read -rp "Merge Omarchy changes into your custom bindings? [Y/n/o] " CONFIRM
+            read -rp "Merge Omarchy changes into your custom bindings? [Y/n/o]" CONFIRM
 
             case "$CONFIRM" in
                 ""|[Yy])
