@@ -141,13 +141,21 @@ else
         echo "WARNING: The Omarchy-managed section of bindings.lua has changed."
         echo "Differences in the Omarchy-managed section:"
         echo
-        diff -u \
-            <(printf '%s\n' "$LOCAL_OMARCHY") \
-            <(printf '%s\n' "$REPO_OMARCHY")
+
+        # diff returns 1 when files differ, which would terminate the script
+        # if set -e is enabled. Capture the output and ignore that status.
+        DIFF=$(
+            diff -u \
+                <(printf '%s\n' "$LOCAL_OMARCHY") \
+                <(printf '%s\n' "$REPO_OMARCHY") \
+            || true
+        )
+
+        echo "$DIFF"
         echo
 
         while true; do
-            read -rp "Merge Omarchy changes into your custom bindings? [Y/n/o]" CONFIRM
+            read -rp "Merge local Omarchy-managed section changes with your custom bindings? [Y/n/o]" CONFIRM
 
             case "$CONFIRM" in
                 ""|[Yy])
