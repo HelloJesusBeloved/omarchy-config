@@ -22,7 +22,7 @@ install_packages() {
         return
     fi  
 
-    sudo pacman -Syu --needed --noconfirm \
+    sudo pacman -Sy --needed --noconfirm \
         - < "$REPO_ROOT/packages/lists/install.txt"
 }
 
