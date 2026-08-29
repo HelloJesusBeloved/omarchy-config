@@ -138,21 +138,37 @@ else
             echo
         fi
     else
+        echo
         echo "WARNING: The Omarchy-managed section of bindings.lua has changed."
         echo "Differences in the Omarchy-managed section:"
         echo
 
-        # diff returns 1 when files differ, which would terminate the script
-        # if set -e is enabled. Capture the output and ignore that status.
-        DIFF=$(
-            diff -u \
-                <(printf '%s\n' "$LOCAL_OMARCHY") \
-                <(printf '%s\n' "$REPO_OMARCHY") \
-            || true
-        )
+        # Create temporary files so diff can compare the extracted sections
+        # and display meaningful filenames.
+        LOCAL_OMARCHY_FILE=$(mktemp)
+        REPO_OMARCHY_FILE=$(mktemp)
+
+        printf '%s\n' "$LOCAL_OMARCHY" > "$LOCAL_OMARCHY_FILE"
+        printf '%s\n' "$REPO_OMARCHY" > "$REPO_OMARCHY_FILE"
+
+        echo "LOCAL: $BINDINGS_LOCAL_LOCATION"
+        echo "REPO:  $BINDINGS_REPO_LOCATION"
+        echo
+        echo "  LOCAL = Omarchy section currently installed on your system"
+        echo "  REPO  = Omarchy section stored in your config repository"
+        echo
+
+        DIFF=$(colordiff -u \
+            --label "LOCAL: $BINDINGS_LOCAL_LOCATION" \
+            --label "REPO:  $BINDINGS_REPO_LOCATION" \
+            "$LOCAL_OMARCHY_FILE" \
+            "$REPO_OMARCHY_FILE" \
+            || true)
 
         echo "$DIFF"
         echo
+
+        rm -f "$LOCAL_OMARCHY_FILE" "$REPO_OMARCHY_FILE"
 
         while true; do
             read -rp "Merge local Omarchy-managed section changes with your custom bindings? [Y/n/o]" CONFIRM
