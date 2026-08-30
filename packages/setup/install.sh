@@ -36,7 +36,7 @@ install_packages() {
     done < "$PACKAGE_LIST"
 
     if [[ ${#PACKAGES_TO_INSTALL[@]} -eq 0 ]]; then
-        echo "All packages are already installed."
+        echo "No packages to install, all packages are already installed."
         return
     fi
 
