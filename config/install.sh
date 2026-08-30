@@ -41,7 +41,8 @@ do
     fi
 done
 
-source $HOME/.bashrc
+echo "To have aliases in the current shell:"
+echo "source $HOME/.bashrc"
 
 
 #2. Glide.ts
