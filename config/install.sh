@@ -41,6 +41,40 @@ do
     fi
 done
 
+# 1. Unalias Omarchy defaults
+UNALIASES=(
+    "zd"
+
+    "a"
+    "c"
+    "cx"
+    "cy"
+    "d"
+    "r"
+    "h"
+    "ic"
+    "ix"
+    "icx"
+    "mup"
+
+    "g"
+    "gcm"
+    "gcam"
+    "gcad"
+)
+
+# Add Unaliases
+for unalias in "${UNALIASES[@]}"
+do
+    UNALIAS_LINE="unalias $unalias 2>/dev/null"
+
+    if ! grep -Fxq "$UNALIAS_LINE" "$HOME/.bashrc"
+    then
+        echo "$UNALIAS_LINE" >> "$HOME/.bashrc"
+        echo "added $UNALIAS_LINE to .bashrc"
+    fi
+done
+
 echo "To have aliases in the current shell:"
 echo "source $HOME/.bashrc"
 
