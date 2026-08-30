@@ -44,7 +44,7 @@ install_packages() {
     printf '  %s\n' "${PACKAGES_TO_INSTALL[@]}"
     echo
 
-    sudo pacman -S --needed --noconfirm "${PACKAGES_TO_INSTALL[@]}"
+    sudo pacman -Sy --needed --noconfirm "${PACKAGES_TO_INSTALL[@]}"
 }
 
 install_aur_packages() {
