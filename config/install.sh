@@ -27,6 +27,8 @@ ALIASES=(
 
     "alias mega='mega-cmd'"
     "alias megas='mega-sync'"
+
+    "alias cm='cmatrix'"
 )
 
 #Add Aliases
