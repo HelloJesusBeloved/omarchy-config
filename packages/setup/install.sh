@@ -17,15 +17,35 @@ done
 
 
 install_packages() {
-    if [[ ! -s "$REPO_ROOT/packages/lists/install.txt" ]]; then
-        echo "No packages to install."
+    local PACKAGE_LIST="$REPO_ROOT/packages/lists/install.txt"
+
+    if [[ ! -s "$PACKAGE_LIST" ]]; then
+        echo "No packages to install, REPO_ROOT/packages/lists/install.txt is empty."
         return
-    fi  
+    fi
 
-    sudo pacman -Sy --needed --noconfirm \
-        - < "$REPO_ROOT/packages/lists/install.txt"
+    local PACKAGES_TO_INSTALL=()
+
+    while IFS= read -r package || [[ -n "$package" ]]; do
+        # Skip blank lines and comments.
+        [[ -z "$package" || "$package" == \#* ]] && continue
+
+        if ! pacman -Q "$package" &>/dev/null; then
+            PACKAGES_TO_INSTALL+=("$package")
+        fi
+    done < "$PACKAGE_LIST"
+
+    if [[ ${#PACKAGES_TO_INSTALL[@]} -eq 0 ]]; then
+        echo "All packages are already installed."
+        return
+    fi
+
+    echo "Packages to install:"
+    printf '  %s\n' "${PACKAGES_TO_INSTALL[@]}"
+    echo
+
+    sudo pacman -S --needed --noconfirm "${PACKAGES_TO_INSTALL[@]}"
 }
-
 
 install_aur_packages() {
     yay -S --needed --noconfirm \
