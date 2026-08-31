@@ -23,17 +23,29 @@ done
 
 #1. Aliases
 ALIASES=(
+    ""
+    ""
+    ""
     "alias vim='nvim'"
+    ""
 
     "alias mega='mega-cmd'"
     "alias megas='mega-sync'"
+    ""
 
     "alias cm='cmatrix'"
+    ""
+    ""
 )
 
 #Add Aliases
 for alias in "${ALIASES[@]}"
 do
+    if [[ -z "$alias" ]]; then
+        echo >> "$HOME/.bashrc"
+        continue
+    fi
+
     if ! grep -Fxq "$alias" "$HOME/.bashrc"
     then
         echo "$alias" >> "$HOME/.bashrc"
@@ -44,6 +56,7 @@ done
 # 1. Unalias Omarchy defaults
 UNALIASES=(
     "zd"
+    ""
 
     "a"
     "c"
@@ -56,16 +69,24 @@ UNALIASES=(
     "ix"
     "icx"
     "mup"
+    ""
 
     "g"
     "gcm"
     "gcam"
     "gcad"
+    ""
+    ""
 )
 
 # Add Unaliases
 for unalias in "${UNALIASES[@]}"
 do
+    if [[ -z "$unalias" ]]; then
+        echo >> "$HOME/.bashrc"
+        continue
+    fi
+
     UNALIAS_LINE="unalias $unalias 2>/dev/null"
 
     if ! grep -Fxq "$UNALIAS_LINE" "$HOME/.bashrc"
