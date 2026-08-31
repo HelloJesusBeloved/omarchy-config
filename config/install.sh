@@ -176,114 +176,59 @@ BINDINGS_REPO_LOCATION="$REPO_ROOT/config/bindings.lua"
 BINDINGS_LOCAL_LOCATION="$HOME/.config/hypr/bindings.lua"
 
 if [[ ! -f "$BINDINGS_LOCAL_LOCATION" ]]; then
-    echo "Local bindings.lua does not exist. Installing from repo..."
-    cp "$BINDINGS_REPO_LOCATION" "$BINDINGS_LOCAL_LOCATION" &&
-        echo "Bindings.lua file successfully installed to $BINDINGS_LOCAL_LOCATION"
-        echo
+    echo "Local bindings.lua does not exist."
+    echo "Please allow Omarchy to generate it before installing custom bindings."
+    echo
+    exit 1
+fi
+
+# Check whether the custom section exists in the local bindings file.
+if ! grep -Fxq -- "--Custom" "$BINDINGS_LOCAL_LOCATION" ||
+   ! grep -Fxq -- "--End-Custom" "$BINDINGS_LOCAL_LOCATION"
+then
+    echo "Custom bindings section not found. Adding custom bindings..."
+
+{
+    printf '\n\n'
+    cat "$BINDINGS_REPO_LOCATION"
+} >> "$BINDINGS_LOCAL_LOCATION"
+
+    echo "Custom bindings successfully added to bindings.lua"
 else
-    # Extract everything before the first --Custom line.
-    REPO_OMARCHY=$(sed '/^--Custom$/q' "$BINDINGS_REPO_LOCATION" | sed '$d')
-    LOCAL_OMARCHY=$(sed '/^--Custom$/q' "$BINDINGS_LOCAL_LOCATION" | sed '$d')
+    # Extract the existing local custom section.
+    LOCAL_CUSTOM=$(sed -n '/^--Custom$/,/^--End-Custom$/p' "$BINDINGS_LOCAL_LOCATION")
 
-    if [[ "$REPO_OMARCHY" == "$LOCAL_OMARCHY" ]]; then
-        echo "Omarchy-managed bindings.lua section is up to date."
+    # Read the repo custom section.
+    REPO_CUSTOM=$(cat "$BINDINGS_REPO_LOCATION")
 
-        if cp "$BINDINGS_REPO_LOCATION" "$BINDINGS_LOCAL_LOCATION"; then
-            echo "Bindings.lua file successfully installed to $BINDINGS_LOCAL_LOCATION"
-            echo
-        else
-            echo "Bindings.lua file failed to install (cp)"
-            echo
-        fi
+    if [[ "$LOCAL_CUSTOM" == "$REPO_CUSTOM" ]]; then
+        echo "Custom bindings are already up to date."
     else
-        echo
-        echo "WARNING: The Omarchy-managed section of bindings.lua has changed."
-        echo "Differences in the Omarchy-managed section:"
-        echo
+        echo "Custom bindings have changed in the repository."
+        echo "Updating the local custom bindings section..."
 
-        # Create temporary files so diff can compare the extracted sections
-        # and display meaningful filenames.
-        LOCAL_OMARCHY_FILE=$(mktemp)
-        REPO_OMARCHY_FILE=$(mktemp)
+        TEMP_FILE=$(mktemp)
 
-        printf '%s\n' "$LOCAL_OMARCHY" > "$LOCAL_OMARCHY_FILE"
-        printf '%s\n' "$REPO_OMARCHY" > "$REPO_OMARCHY_FILE"
+        # Keep everything before --Custom.
+        sed '/^--Custom$/q' "$BINDINGS_LOCAL_LOCATION" | sed '$d' > "$TEMP_FILE"
 
-        echo "LOCAL: $BINDINGS_LOCAL_LOCATION"
-        echo "REPO:  $BINDINGS_REPO_LOCATION"
-        echo
-        echo "  LOCAL = Omarchy section currently installed on your system"
-        echo "  REPO  = Omarchy section stored in your config repository"
-        echo
+        # Add two blank lines before the custom section.
+        printf '\n\n' >> "$TEMP_FILE"
 
-        DIFF=$(colordiff -u \
-            --label "LOCAL: $BINDINGS_LOCAL_LOCATION" \
-            --label "REPO:  $BINDINGS_REPO_LOCATION" \
-            "$LOCAL_OMARCHY_FILE" \
-            "$REPO_OMARCHY_FILE" \
-            || true)
+        # Add the updated custom section from the repo.
+        cat "$BINDINGS_REPO_LOCATION" >> "$TEMP_FILE"
 
-        echo "$DIFF"
-        echo
+        # Keep everything after --End-Custom.
+        sed -n '/^--End-Custom$/,$p' "$BINDINGS_LOCAL_LOCATION" | sed '1d' >> "$TEMP_FILE"
 
-        rm -f "$LOCAL_OMARCHY_FILE" "$REPO_OMARCHY_FILE"
+        if cp "$TEMP_FILE" "$BINDINGS_LOCAL_LOCATION"; then
+            echo "Custom bindings successfully updated."
+        else
+            echo "ERROR: Failed to update custom bindings."
+            rm -f "$TEMP_FILE"
+            exit 1
+        fi
 
-        while true; do
-            read -rp "Merge local Omarchy-managed section changes with your custom bindings? [Y/n/o]" CONFIRM
-
-            case "$CONFIRM" in
-                ""|[Yy])
-                    # Keep the updated Omarchy-managed section from the local
-                    # file and replace everything from --Custom onward with
-                    # the repo version.
-                    TEMP_FILE=$(mktemp)
-
-                    if {
-                        sed '/^--Custom$/q' "$BINDINGS_LOCAL_LOCATION" | sed '$d'
-                        sed -n '/^--Custom$/,$p' "$BINDINGS_REPO_LOCATION"
-                    } > "$TEMP_FILE" &&
-                    cp "$TEMP_FILE" "$BINDINGS_LOCAL_LOCATION"
-                    then
-                        echo "Bindings.lua merged successfully."
-                    else
-                        echo "Bindings.lua merge failed."
-                        rm -f "$TEMP_FILE"
-                        exit 1
-                    fi
-
-                    rm -f "$TEMP_FILE"
-                    break
-                    ;;
-
-                [Oo])
-                    if cp "$BINDINGS_REPO_LOCATION" "$BINDINGS_LOCAL_LOCATION"; then
-                        echo "Bindings.lua overwritten with the repo version."
-                    else
-                        echo "Bindings.lua file failed to install (cp)"
-                    fi
-                    break
-                    ;;
-
-                [Nn])
-                    echo "Bindings.lua installation cancelled."
-                    break
-                    ;;
-
-                   *)
-                    echo "Invalid option. Enter = merge, O = overwrite, N = cancel."
-                    echo
-                    echo "Options:"
-                    echo "  Enter / Y  Merge:"
-                    echo "              Keep Omarchy's updated section from the local file"
-                    echo "              and use your custom bindings from the repo."
-                    echo "  O          Overwrite:"
-                    echo "              Replace the entire local file with the repo version."
-                    echo "  N          Cancel:"
-                    echo "              Make no changes to the local file."
-                    echo "  *          Show this help."
-                    echo
-                    ;;
-            esac
-        done
+        rm -f "$TEMP_FILE"
     fi
 fi
