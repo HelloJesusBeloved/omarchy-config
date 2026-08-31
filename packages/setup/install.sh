@@ -48,10 +48,35 @@ install_packages() {
 }
 
 install_aur_packages() {
-    yay -S --needed --noconfirm \
-        - < "$REPO_ROOT/packages/lists/install-aur.txt"
-}
+    local PACKAGE_LIST="$REPO_ROOT/packages/lists/install-aur.txt"
 
+    if [[ ! -s "$PACKAGE_LIST" ]]; then
+        echo "No AUR packages to install, REPO_ROOT/packages/lists/install-aur.txt is empty."
+        return
+    fi
+
+    local PACKAGES_TO_INSTALL=()
+
+    while IFS= read -r package || [[ -n "$package" ]]; do
+        # Skip blank lines and comments.
+        [[ -z "$package" || "$package" == \#* ]] && continue
+
+        if ! pacman -Q "$package" &>/dev/null; then
+            PACKAGES_TO_INSTALL+=("$package")
+        fi
+    done < "$PACKAGE_LIST"
+
+    if [[ ${#PACKAGES_TO_INSTALL[@]} -eq 0 ]]; then
+        echo "No AUR packages to install, all AUR packages are already installed."
+        return
+    fi
+
+    echo "AUR packages to install:"
+    printf '  %s\n' "${PACKAGES_TO_INSTALL[@]}"
+    echo
+
+    yay -S --needed --noconfirm "${PACKAGES_TO_INSTALL[@]}"
+}
 
 install_mega() {
     if pacman -Q megacmd &>/dev/null; then
