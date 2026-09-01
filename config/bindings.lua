@@ -43,6 +43,13 @@ for _, key in ipairs(SUPER_CTRL_PLUS) do
   hl.unbind("SUPER + CTRL + " .. key)
 end
 
+--E. Single Keys
+--a. PRINT
+hl.unbind("PRINT")
+hl.unbind("ALT + PRINT")
+hl.unbind("SUPER + PRINT")
+hl.unbind("SUPER + CTRL + PRINT")
+
 
 --2. Add Mine
 --A. System
@@ -50,13 +57,17 @@ end
 --Set Super + L to Lock system
 o.bind("SUPER + L", "Lock system", "omarchy system lock")
 
+--Screen Capture
+o.bind("SUPER + SHIFT + S", "Screenshot", "omarchy capture screenshot")
+o.bind("SUPER + SHIFT + T", "Extract Text", "omarchy capture text")
+o.bind("SUPER + SHIFT + ALT + S", "Capture Menu", "omarchy menu summon capture")
 
 --B. Apps
 --Set Super + Shift + M to cliamp
 o.bind("SUPER + SHIFT + M", "Music TUI", "omarchy launch or focus tui cliamp")
 
 --Set Super + Shift + S to Signal
-o.bind("SUPER + SHIFT + S", "Signal", "omarchy launch signal")
+o.bind("SUPER + SHIFT + A", "Signal", "omarchy launch signal")
 
 --Set Super + D to Discord
 o.bind("SUPER + SHIFT + D", "Discord", "omarchy launch discord community")
