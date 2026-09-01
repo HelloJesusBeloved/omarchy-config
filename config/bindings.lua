@@ -1,4 +1,6 @@
 --Custom
+
+
 --1. System
 
 --Set Super + L to Lock system
@@ -22,4 +24,6 @@ o.bind("SUPER + SHIFT + S", "Signal", "omarchy launch signal")
 --Set Super + D to Discord
 hl.unbind("SUPER + SHIFT + D") --Used to be lazy docker
 o.bind("SUPER + SHIFT + D", "Discord", "omarchy launch discord community")
+
+
 --End-Custom
