@@ -232,3 +232,14 @@ else
         rm -f "$TEMP_FILE"
     fi
 fi
+
+
+#Plugins to add/enable
+PLUGINS_TO_ENABLE=(
+  "omarchy.media"
+)
+
+for plugin in "${PLUGINS_TO_ENABLE[@]}"
+do
+    omarchy plugin enable $plugin
+done
