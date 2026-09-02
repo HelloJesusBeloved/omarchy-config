@@ -34,6 +34,7 @@ ALIASES=(
     ""
 
     "alias cm='cmatrix'"
+    "alias fsf='fastfetch'"
     ""
     ""
 )
