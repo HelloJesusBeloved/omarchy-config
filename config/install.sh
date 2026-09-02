@@ -233,7 +233,6 @@ fi
 
 #Plugins to add/enable
 PLUGINS_TO_ENABLE=(
-  "omarchy.media"
 )
 
 for plugin in "${PLUGINS_TO_ENABLE[@]}"
