@@ -5,6 +5,8 @@
 --A SUPER +
 local SUPER_PLUS = {
   "L",
+  "J",
+  "K",
 }
 
 for _, key in ipairs(SUPER_PLUS) do
@@ -36,7 +38,7 @@ end
 
 --D. SUPER + CTRL +
 local SUPER_CTRL_PLUS = {
-  "L",
+  "K",
 }
 
 for _, key in ipairs(SUPER_CTRL_PLUS) do
@@ -54,13 +56,23 @@ hl.unbind("SUPER + CTRL + PRINT")
 --2. Add Mine
 --A. System
 
---Set Super + L to Lock system
-o.bind("SUPER + L", "Lock system", "omarchy system lock")
-
 --Screen Capture
 o.bind("SUPER + SHIFT + S", "Screenshot", "omarchy capture screenshot")
 o.bind("SUPER + SHIFT + T", "Extract Text", "omarchy capture text")
 o.bind("SUPER + SHIFT + ALT + S", "Capture Menu", "omarchy menu summon capture")
+
+--Vim Window Navigation
+o.bind("SUPER + J", "Focus window down", hl.dsp.focus({ direction = "d" }))
+o.bind("SUPER + K", "Focus window down", hl.dsp.focus({ direction = "u" }))
+o.bind("SUPER + L", "Focus window down", hl.dsp.focus({ direction = "l" }))
+o.bind("SUPER + H", "Focus window down", hl.dsp.focus({ direction = "r" }))
+
+--Keybindings
+o.bind("SUPER + CTRL + K", "Show Keybindings", "omarchy menu keybindings")
+
+--Toggle Window Split
+o.bind("SUPER + I", "Toggle window split", hl.dsp.layout("togglesplit"))
+
 
 --B. Apps
 --Set Super + Shift + M to cliamp
