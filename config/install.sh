@@ -212,9 +212,6 @@ else
         # Keep everything before --Custom.
         sed '/^--Custom$/q' "$BINDINGS_LOCAL_LOCATION" | sed '$d' > "$TEMP_FILE"
 
-        # Add two blank lines before the custom section.
-        printf '\n\n' >> "$TEMP_FILE"
-
         # Add the updated custom section from the repo.
         cat "$BINDINGS_REPO_LOCATION" >> "$TEMP_FILE"
 
