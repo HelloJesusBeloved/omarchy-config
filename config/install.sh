@@ -232,11 +232,33 @@ else
 fi
 
 
-#Plugins to add/enable
+#5. Plugins to add/enable
 PLUGINS_TO_ENABLE=(
 )
 
 for plugin in "${PLUGINS_TO_ENABLE[@]}"
 do
     omarchy plugin enable $plugin
+done
+
+
+#6. Directorys to make
+DIRECTORYS_TO_MAKE=(
+$HOME/Videos/YouTube/YouTube-dl/
+$HOME/Code/Projects/
+$HOME/Pictures/Wallpapers/
+)
+
+for dir in "${DIRECTORYS_TO_MAKE[@]}"
+do
+  if [[ ! -d "$dir" ]]; then
+
+    if mkdir -p $dir
+    then
+      echo "Directory $dir successfully installed"
+    else
+      echo "Directory $dir could not be installed"
+    fi
+
+  fi
 done
