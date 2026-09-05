@@ -35,6 +35,7 @@ ALIASES=(
 
     "alias cm='cmatrix'"
     "alias fsf='fastfetch'"
+    "alias om='omarchy launch screensaver'"
     ""
     ""
 )
