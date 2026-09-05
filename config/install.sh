@@ -273,7 +273,7 @@ if ! command -v mega-cmd &>/dev/null; then
     echo
     echo "mega-cmd is not installed. Please install it before configuring MEGA Sync."
 else
-    if ! mega-whoami 2>&1 | grep -Fq "Not logged in."; then
+    if mega-whoami 2>&1 | grep -Fq "Not logged in."; then
         echo
         echo "MEGA account is not logged in. Please run 'mega-login' first."
     else
