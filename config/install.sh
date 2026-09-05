@@ -262,3 +262,38 @@ do
 
   fi
 done
+
+
+#7. Mega Syncs to add
+MEGA_SYNCS_TO_ADD=(
+    "$HOME/Videos/YouTube/YouTube-dl/;/Videos/YouTube/YouTube-dl"
+)
+
+if ! command -v mega-cmd &>/dev/null; then
+    echo
+    echo "mega-cmd is not installed. Please install it before configuring MEGA Sync."
+else
+if ! mega-whoami 2>&1 | grep -Fq "Not logged in."; then
+    echo
+    echo "MEGA account is not logged in. Please run 'mega-login' first."
+fi
+  for sync in "${MEGA_SYNCS_TO_ADD[@]}"
+  do
+      LOCAL_PATH="${sync%%;*}"
+      REMOTE_PATH="${sync#*;}"
+
+      if mega-sync | grep -Fq "$LOCAL_PATH"; then
+          echo
+          echo "MEGA Sync already configured: $LOCAL_PATH -> $REMOTE_PATH"
+      else
+          echo
+          echo "MEGA Sync not configured: $LOCAL_PATH -> $REMOTE_PATH"
+
+          if mega-sync "$LOCAL_PATH" "$REMOTE_PATH"; then
+              echo "MEGA Sync successfully added: $LOCAL_PATH -> $REMOTE_PATH"
+          else
+              echo "MEGA Sync could not be added: $LOCAL_PATH -> $REMOTE_PATH"
+          fi
+      fi
+  done
+fi
