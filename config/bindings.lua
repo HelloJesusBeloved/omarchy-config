@@ -21,6 +21,7 @@ local SUPER_SHIFT_PLUS = {
   "S",
   "G",
   "D",
+  "B",
 }
 
 for _, key in ipairs(SUPER_SHIFT_PLUS ) do
@@ -84,5 +85,11 @@ o.bind("SUPER + SHIFT + A", "Signal", "omarchy launch signal")
 --Set Super + D to Discord
 o.bind("SUPER + SHIFT + D", "Discord", "omarchy launch discord community")
 
+--Set Super + Shift + B to BlueBubbles
+o.bind("SUPER + SHIFT + B", "BlueBubbles", "bluebubbles")
+
+--Set Super + Shift + V to mpv gui, and Super + Shift + Alt + V to open the clipboard in player
+o.bind("SUPER + SHIFT + V", "mpv", "mpv --player-operation-mode=pseudo-gui --fs")
+o.bind("SUPER + SHIFT + ALT + V", "mpv", "mpv --player-operation-mode=pseudo-gui --fs \"$(wl-paste --no-newline)\"")
 
 --End-Custom
