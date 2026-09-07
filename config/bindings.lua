@@ -23,6 +23,7 @@ local SUPER_SHIFT = {
   "G",
   "D",
   "B",
+  "C",
 }
 
 for _, key in ipairs(SUPER_SHIFT) do
@@ -43,6 +44,7 @@ end
 --D. SUPER + CTRL +
 local SUPER_CTRL = {
   "K",
+  "C",
 }
 
 for _, key in ipairs(SUPER_CTRL) do
@@ -65,6 +67,7 @@ hl.unbind("SUPER + CTRL + PRINT")
 --Screen Capture
 o.bind("SUPER + SHIFT + S", "Screenshot", "omarchy capture screenshot")
 o.bind("SUPER + SHIFT + T", "Extract Text", "omarchy capture text")
+o.bind("SUPER + SHIFT + C", "Extract Color", "hyprpicker -a")
 o.bind("SUPER + SHIFT + ALT + S", "Capture Menu", "omarchy menu summon capture")
 
 --Vim Window Navigation
