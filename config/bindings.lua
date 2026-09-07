@@ -3,18 +3,19 @@
 
 --1. Remove Defaults
 --A SUPER +
-local SUPER_PLUS = {
+local SUPER = {
   "L",
   "J",
   "K",
 }
 
-for _, key in ipairs(SUPER_PLUS) do
+for _, key in ipairs(SUPER) do
   hl.unbind("SUPER + " .. key)
 end
 
+
 --B. SUPER + SHIFT +
-local SUPER_SHIFT_PLUS = {
+local SUPER_SHIFT = {
   "M",
   "N",
   "A",
@@ -24,27 +25,30 @@ local SUPER_SHIFT_PLUS = {
   "B",
 }
 
-for _, key in ipairs(SUPER_SHIFT_PLUS ) do
+for _, key in ipairs(SUPER_SHIFT) do
   hl.unbind("SUPER + SHIFT + " .. key)
 end
 
+
 --C. SUPER + SHIFT + ALT +
-local SUPER_SHIFT_ALT_PLUS = {
+local SUPER_SHIFT_ALT = {
   "M",
 }
 
-for _, key in ipairs(SUPER_SHIFT_ALT_PLUS) do
+for _, key in ipairs(SUPER_SHIFT_ALT) do
   hl.unbind("SUPER + SHIFT + ALT + " .. key)
 end
 
+
 --D. SUPER + CTRL +
-local SUPER_CTRL_PLUS = {
+local SUPER_CTRL = {
   "K",
 }
 
-for _, key in ipairs(SUPER_CTRL_PLUS) do
+for _, key in ipairs(SUPER_CTRL) do
   hl.unbind("SUPER + CTRL + " .. key)
 end
+
 
 --E. Single Keys
 --a. PRINT
@@ -52,6 +56,7 @@ hl.unbind("PRINT")
 hl.unbind("ALT + PRINT")
 hl.unbind("SUPER + PRINT")
 hl.unbind("SUPER + CTRL + PRINT")
+
 
 
 --2. Add Mine
@@ -68,7 +73,7 @@ o.bind("SUPER + K", "Focus window down", hl.dsp.focus({ direction = "u" }))
 o.bind("SUPER + L", "Focus window down", hl.dsp.focus({ direction = "l" }))
 o.bind("SUPER + H", "Focus window down", hl.dsp.focus({ direction = "r" }))
 
---Keybindings
+--Show Keybindings
 o.bind("SUPER + CTRL + K", "Show Keybindings", "omarchy menu keybindings")
 
 --Toggle Window Split
@@ -76,20 +81,22 @@ o.bind("SUPER + I", "Toggle window split", hl.dsp.layout("togglesplit"))
 
 
 --B. Apps
---Set Super + Shift + M to cliamp
+--cliamp = Super + Shift + M
 o.bind("SUPER + SHIFT + M", "Music TUI", "omarchy launch or focus tui cliamp")
 
---Set Super + Shift + S to Signal
+--Signal = Super + Shift + A
 o.bind("SUPER + SHIFT + A", "Signal", "omarchy launch signal")
 
---Set Super + D to Discord
+--Discord = Super + Shift + D
 o.bind("SUPER + SHIFT + D", "Discord", "omarchy launch discord community")
 
---Set Super + Shift + B to BlueBubbles
+--BlueBubbles = Super + Shift + B
 o.bind("SUPER + SHIFT + B", "BlueBubbles", "bluebubbles")
 
---Set Super + Shift + V to mpv gui, and Super + Shift + Alt + V to open the clipboard in player
+--mpv gui fullscreen = Super + Shift + V
+--mpv gui fullscreen with clipboard link = Super + Shift + Alt + V
 o.bind("SUPER + SHIFT + V", "mpv", "mpv --player-operation-mode=pseudo-gui --fs")
 o.bind("SUPER + SHIFT + ALT + V", "mpv", "mpv --player-operation-mode=pseudo-gui --fs \"$(wl-paste --no-newline)\"")
+
 
 --End-Custom
