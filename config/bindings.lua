@@ -73,8 +73,8 @@ o.bind("SUPER + SHIFT + ALT + S", "Capture Menu", "omarchy menu summon capture")
 --Vim Window Navigation
 o.bind("SUPER + J", "Focus window down", hl.dsp.focus({ direction = "d" }))
 o.bind("SUPER + K", "Focus window down", hl.dsp.focus({ direction = "u" }))
-o.bind("SUPER + L", "Focus window down", hl.dsp.focus({ direction = "l" }))
-o.bind("SUPER + H", "Focus window down", hl.dsp.focus({ direction = "r" }))
+o.bind("SUPER + L", "Focus window down", hl.dsp.focus({ direction = "r" }))
+o.bind("SUPER + H", "Focus window down", hl.dsp.focus({ direction = "l" }))
 
 --Show Keybindings
 o.bind("SUPER + CTRL + K", "Show Keybindings", "omarchy menu keybindings")
