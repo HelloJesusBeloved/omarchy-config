@@ -121,7 +121,7 @@ if [ -d "$GLIDE_REPO" ]; then
     git fetch
     git pull
 
-  else 
+  else
 
     echo "Failed to cd to $GLIDE_REPO, could not pull glide.ts"
 
@@ -141,7 +141,7 @@ else
   fi
 fi
 
-#If current local glide.ts is different that the freshly pulled repo glide.ts then
+#If current local glide.ts is different from the freshly pulled repo glide.ts then
 if ! cmp -s "$LOCAL_GLIDE_TS" "$REPO_GLIDE_TS"; then
     if cp $REPO_GLIDE_TS $LOCAL_GLIDE_TS
     then
