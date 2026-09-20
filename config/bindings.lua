@@ -62,6 +62,7 @@ hl.unbind("SUPER + CTRL + PRINT")
 
 
 --2. Add Mine
+--Note: WC = open with clipboard contents passed
 --A. System
 
 --Screen Capture
@@ -97,9 +98,14 @@ o.bind("SUPER + SHIFT + D", "Discord", "omarchy launch discord community")
 o.bind("SUPER + SHIFT + B", "BlueBubbles", "bluebubbles")
 
 --mpv gui fullscreen = Super + Shift + V
---mpv gui fullscreen with clipboard link = Super + Shift + Alt + V
+--mpv gui fullscreen WC = Super + Shift + Alt + V
 o.bind("SUPER + SHIFT + V", "mpv", "mpv --player-operation-mode=pseudo-gui --fs")
 o.bind("SUPER + SHIFT + ALT + V", "mpv", "mpv --player-operation-mode=pseudo-gui --fs \"$(wl-paste --no-newline)\"")
+
+--Brave = Super + Shift + Alt + Enter
+--Brave WC = Super + Shift + Control + Alt + Enter
+o.bind("SUPER + SHIFT + ALT + Return", "Brave", "brave")
+o.bind("SUPER + SHIFT + CTRL + ALT + Return", "Brave", "brave \"$(wl-paste --no-newline)\"")
 
 
 --End-Custom
