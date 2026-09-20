@@ -1,0 +1,11 @@
+[Unit]
+Description=Start MEGA CMD Server
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/mega-cmd-server
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

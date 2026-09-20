@@ -19,6 +19,7 @@ INSTALL_SCRIPTS=(
     "$REPO_ROOT/packages/setup/remove.sh"
     "$REPO_ROOT/packages/setup/install.sh"
     "$REPO_ROOT/config/install.sh"
+    "$REPO_ROOT/services/install.sh"
 )
 
 
