@@ -108,4 +108,8 @@ o.bind("SUPER + SHIFT + ALT + Return", "Brave", "brave")
 o.bind("SUPER + SHIFT + CTRL + ALT + Return", "Brave", "brave \"$(wl-paste --no-newline)\"")
 
 
+--Remmina = Super + Shift + R
+o.bind("SUPER + SHIFT + R", "Remmina", "remmina")
+
+
 --End-Custom

@@ -1,2 +1,4 @@
 colordiff
 cmatrix
+remmina
+libvncserver
