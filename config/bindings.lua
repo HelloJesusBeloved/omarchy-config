@@ -59,6 +59,10 @@ hl.unbind("ALT + PRINT")
 hl.unbind("SUPER + PRINT")
 hl.unbind("SUPER + CTRL + PRINT")
 
+--b. Volume buttons
+hl.unbind("XF86AudioRaiseVolume")
+hl.unbind("XF86AudioLowerVolume")
+
 
 
 --2. Add Mine
@@ -82,6 +86,10 @@ o.bind("SUPER + CTRL + K", "Show Keybindings", "omarchy menu keybindings")
 
 --Toggle Window Split
 o.bind("SUPER + I", "Toggle window split", hl.dsp.layout("togglesplit"))
+
+--Volume max 150%
+o.bind("XF86AudioRaiseVolume", "Volume Up", "wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+ && omarchy-osd -i volume-high -p \"$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print $2 * 100}')\"")
+o.bind("XF86AudioLowerVolume", "Volume Down", "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && omarchy-osd -i volume-high -p \"$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print $2 * 100}')\"")
 
 
 --B. Apps
