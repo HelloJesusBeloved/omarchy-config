@@ -245,9 +245,10 @@ done
 
 #6. Directorys to make
 DIRECTORYS_TO_MAKE=(
-$HOME/Videos/YouTube/YouTube-dl/
-$HOME/Code/Projects/
-$HOME/Pictures/Wallpapers/
+"$HOME/Videos/YouTube/YouTube-dl/"
+"$HOME/Code/Projects/"
+"$HOME/Pictures/"{Wallpapers,Screenshots}
+"$HOME/Downloads/"{Applications/{Apps,Bootable},Backups}
 )
 
 for dir in "${DIRECTORYS_TO_MAKE[@]}"
