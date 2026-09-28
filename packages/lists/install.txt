@@ -2,3 +2,4 @@ colordiff
 cmatrix
 remmina
 libvncserver
+prismlauncher
