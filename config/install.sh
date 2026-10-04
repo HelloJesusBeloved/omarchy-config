@@ -103,48 +103,60 @@ echo "source $HOME/.bashrc"
 
 
 #2. Glide.ts
-GLIDE_REPO_LOCATION="$HOME/Code/Projects"
-GLIDE_REPO="$HOME/Code/Projects/glide-config"
-REPO_GLIDE_TS="$HOME/Code/Projects/glide-config/glide.ts"
+GLIDE_REPO_LOCATION="$HOME/Code/Projects/Prod"
+GLIDE_REPO="$GLIDE_REPO_LOCATION/glide-config"
 
+REPO_GLIDE_TS="$GLIDE_REPO/glide.ts"
 LOCAL_GLIDE_TS="$HOME/.config/glide/glide.ts"
 
-mkdir -p $GLIDE_REPO_LOCATION
+mkdir -p "$GLIDE_REPO_LOCATION"
 
-if [ -d "$GLIDE_REPO" ]; then
+if [[ ! -d "$GLIDE_REPO/.git" ]]; then
 
-  if cd $GLIDE_REPO
-  then
+    echo "Glide config repo not found. Cloning..."
 
-    echo "Checking for Glide.ts remote repo changes..."
-
-    git fetch
-    git pull
-
-  else
-
-    echo "Failed to cd to $GLIDE_REPO, could not pull glide.ts"
-
-  fi
+    if git clone "https://git.nerdvpn.de/HelloJesusBeloved/glide-config" "$GLIDE_REPO"; then
+        echo "Glide config repo cloned successfully."
+    else
+        echo "Failed to clone Glide config repo."
+        exit 1
+    fi
 
 else
 
-  if cd $GLIDE_REPO_LOCATION
-  then
+    GLIDE_BRANCH="$(git -C "$GLIDE_REPO" branch --show-current)"
 
-    git clone https://git.nerdvpn.de/HelloJesusBeloved/glide-config
+    LOCAL_COMMIT="$(git -C "$GLIDE_REPO" rev-parse HEAD)"
 
-  else
+    REMOTE_COMMIT="$(
+        git ls-remote "$GLIDE_REPO" "refs/heads/$GLIDE_BRANCH" |
+        awk '{print $1}'
+    )"
 
-    echo "Failed to cd to $GLIDE_REPO_LOCATION, could not clone glide.ts"
+    if [[ -z "$REMOTE_COMMIT" ]]; then
+        echo "Failed to check Glide config remote."
+        exit 1
+    fi
 
-  fi
+    if [[ "$LOCAL_COMMIT" == "$REMOTE_COMMIT" ]]; then
+        echo
+        echo "Glide config repo is already up to date."
+    else
+        echo "Glide config repo has changes. Updating..."
+
+        if git -C "$GLIDE_REPO" fetch origin "$GLIDE_BRANCH" &&
+           git -C "$GLIDE_REPO" merge --ff-only "origin/$GLIDE_BRANCH"; then
+            echo "Glide config repo updated successfully."
+        else
+            echo "Failed to update Glide config repo."
+            exit 1
+        fi
+    fi
+
 fi
 
-#If current local glide.ts is different from the freshly pulled repo glide.ts then
 if ! cmp -s "$LOCAL_GLIDE_TS" "$REPO_GLIDE_TS"; then
-    if cp $REPO_GLIDE_TS $LOCAL_GLIDE_TS
-    then
+    if cp "$REPO_GLIDE_TS" "$LOCAL_GLIDE_TS"; then
         echo "Glide Configuration File Updated Successfully"
         echo
     else
