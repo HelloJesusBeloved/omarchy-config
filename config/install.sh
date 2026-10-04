@@ -297,7 +297,7 @@ else
             LOCAL_PATH="${sync%%;*}"
             REMOTE_PATH="${sync#*;}"
 
-            if mega-sync | grep -Fq "$LOCAL_PATH"; then
+            if mega-sync "$LOCAL_PATH" &>/dev/null; then
                 echo
                 echo "MEGA Sync already configured: $LOCAL_PATH -> $REMOTE_PATH"
             else
