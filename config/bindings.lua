@@ -31,7 +31,17 @@ for _, key in ipairs(SUPER_SHIFT) do
 end
 
 
---C. SUPER + SHIFT + ALT +
+--C. SUPER + ALT +
+local SUPER_ALT = {
+  "K",
+}
+
+for _, key in ipairs(SUPER_ALT) do
+  hl.unbind("SUPER + ALT + " .. key)
+end
+
+
+--D. SUPER + SHIFT + ALT +
 local SUPER_SHIFT_ALT = {
   "M",
 }
@@ -41,7 +51,7 @@ for _, key in ipairs(SUPER_SHIFT_ALT) do
 end
 
 
---D. SUPER + CTRL +
+--E. SUPER + CTRL +
 local SUPER_CTRL = {
   "K",
   "C",
@@ -52,7 +62,7 @@ for _, key in ipairs(SUPER_CTRL) do
 end
 
 
---E. Single Keys
+--F. Single Keys
 --a. PRINT
 hl.unbind("PRINT")
 hl.unbind("ALT + PRINT")
@@ -90,6 +100,23 @@ o.bind("SUPER + I", "Toggle window split", hl.dsp.layout("togglesplit"))
 --Volume max 150%
 o.bind("XF86AudioRaiseVolume", "Volume Up", "wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+ && omarchy-osd -i volume-high -p \"$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print $2 * 100}')\"")
 o.bind("XF86AudioLowerVolume", "Volume Down", "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && omarchy-osd -i volume-high -p \"$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print $2 * 100}')\"")
+
+--Resize active window
+hl.bind("SUPER + ALT + H",
+  hl.dsp.window.resize({ x = -20, y = 0, relative = true }),
+  { repeating = true })
+
+hl.bind("SUPER + ALT + L",
+  hl.dsp.window.resize({ x = 20, y = 0, relative = true }),
+  { repeating = true })
+
+hl.bind("SUPER + ALT + K",
+  hl.dsp.window.resize({ x = 0, y = -20, relative = true }),
+  { repeating = true })
+
+hl.bind("SUPER + ALT + J",
+  hl.dsp.window.resize({ x = 0, y = 20, relative = true }),
+  { repeating = true })
 
 
 --B. Apps
