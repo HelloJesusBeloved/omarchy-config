@@ -118,6 +118,12 @@ hl.bind("SUPER + ALT + J",
   hl.dsp.window.resize({ x = 0, y = 20, relative = true }),
   { repeating = true })
 
+--Alt + HJKL = Arrow Keys
+hl.bind("ALT + H", hl.dsp.send_shortcut({ mods = "", key = "left" }), { repeating = true })
+hl.bind("ALT + J", hl.dsp.send_shortcut({ mods = "", key = "down" }), { repeating = true })
+hl.bind("ALT + K", hl.dsp.send_shortcut({ mods = "", key = "up" }), { repeating = true })
+hl.bind("ALT + L", hl.dsp.send_shortcut({ mods = "", key = "right" }), { repeating = true })
+
 
 --B. Apps
 --cliamp = Super + Shift + M
