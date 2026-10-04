@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+# Paste history entry 1 (the second-newest item) in Omarchy 4.
+# Install as ~/.local/bin/omarchy-paste-previous and launch via o.bind().
+set -euo pipefail
+
+fail() {
+  printf 'Previous clipboard: %s\n' "$1" >&2
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send 'Previous clipboard' "$1" || true
+  fi
+  exit 1
+}
+
+history_file="$HOME/.local/state/omarchy/clipboard-history.json"
+[[ -r "$history_file" ]] || fail 'Clipboard history is missing or unreadable.'
+[[ -n ${XDG_RUNTIME_DIR:-} ]] || fail 'Run this inside your desktop session.'
+
+# Ignore overlapping invocations while a paste is in progress.
+exec 9>"$XDG_RUNTIME_DIR/omarchy-paste-previous.lock"
+flock -n 9 || exit 0
+
+# Capture the selected entry once; all fields come from this same snapshot.
+entry=$(jq -ce '.[1] | select(type == "object")' "$history_file") ||
+  fail 'Clipboard history does not contain a valid second entry.'
+
+entry_type=$(jq -er '.type | select(. == "text" or . == "image")' <<< "$entry") ||
+  fail 'The second clipboard entry is not text or an image.'
+
+case "$entry_type" in
+  text)
+    jq -e '.text | type == "string"' <<< "$entry" >/dev/null ||
+      fail 'The selected text entry is invalid.'
+
+    # Decode directly to a pipe to preserve trailing newlines and large text.
+    # Close fd 9 in wl-copy so its background process cannot retain our lock.
+    printf '%s' "$entry" | jq -j '.text' |
+      wl-copy --type 'text/plain;charset=utf-8' 9>&- ||
+      fail 'Could not place the text on the clipboard.'
+    ;;
+
+  image)
+    image_mime=$(jq -er '.mime | strings | select(startswith("image/"))' <<< "$entry") ||
+      fail 'The image entry has no valid image MIME type.'
+    image_path=$(jq -er '.path | strings | select(length > 0)' <<< "$entry") ||
+      fail 'The image entry has no file path.'
+    [[ -f "$image_path" && -r "$image_path" ]] ||
+      fail 'The saved clipboard image is missing or unreadable.'
+
+    # Serve the original image bytes with their recorded MIME type.
+    wl-copy --type "$image_mime" 9>&- < "$image_path" ||
+      fail 'Could not place the image on the clipboard.'
+    ;;
+esac
+
+# This delay is in the external helper, never in the compositor event loop.
+sleep 0.15
+
+# Only the validated type (text/image) enters Lua; clipboard data never does.
+hyprctl eval "
+  local window = hl.get_active_window()
+  if not window then return end
+
+  local mods = 'CTRL'
+
+  -- Match Omarchy terminal tags, including dynamic tags ending in '*'.
+  -- Image-aware terminal apps receive Ctrl+V themselves; the terminal's
+  -- Ctrl+Shift+V action is used only for text.
+  if '$entry_type' == 'text' then
+    for _, tag in ipairs(window.tags or {}) do
+      if tag == 'terminal' or tag == 'terminal*' then
+        mods = 'CTRL SHIFT'
+        break
+      end
+    end
+  end
+
+  hl.dispatch(hl.dsp.send_key_state({
+    mods = mods,
+    key = 'V',
+    state = 'down',
+    window = window
+  }))
+
+  hl.dispatch(hl.dsp.send_key_state({
+    mods = mods,
+    key = 'V',
+    state = 'up',
+    window = window
+  }))
+"

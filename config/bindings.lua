@@ -34,6 +34,7 @@ end
 --C. SUPER + ALT +
 local SUPER_ALT = {
   "K",
+  "V",
 }
 
 for _, key in ipairs(SUPER_ALT) do
@@ -123,6 +124,14 @@ hl.bind("ALT + H", hl.dsp.send_shortcut({ mods = "", key = "left" }), { repeatin
 hl.bind("ALT + J", hl.dsp.send_shortcut({ mods = "", key = "down" }), { repeating = true })
 hl.bind("ALT + K", hl.dsp.send_shortcut({ mods = "", key = "up" }), { repeating = true })
 hl.bind("ALT + L", hl.dsp.send_shortcut({ mods = "", key = "right" }), { repeating = true })
+
+--Paste 2nd to last clipboard item
+o.bind(
+  "SUPER + ALT + V",
+  "Paste Previous Clipboard",
+  [[ "$HOME/.local/bin/omarchy-paste-previous" ]],
+  { release = true }
+)
 
 
 --B. Apps
