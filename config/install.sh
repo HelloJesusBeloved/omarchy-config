@@ -186,65 +186,102 @@ else
 fi
 
 
-# 4. Key Binds
-BINDINGS_REPO_LOCATION="$REPO_ROOT/config/bindings.lua"
-BINDINGS_LOCAL_LOCATION="$HOME/.config/hypr/bindings.lua"
+# 4. Hyprland configuration installation
+HYPRLAND_CONFIGS=(
+    "$REPO_ROOT/config/bindings.lua;$HOME/.config/hypr/bindings.lua"
+    "$REPO_ROOT/config/input.lua;$HOME/.config/hypr/input.lua"
+    "$REPO_ROOT/config/looknfeel.lua;$HOME/.config/hypr/looknfeel.lua"
+)
 
-if [[ ! -f "$BINDINGS_LOCAL_LOCATION" ]]; then
-    echo "Local bindings.lua does not exist."
-    echo "Please allow Omarchy to generate it before installing custom bindings."
-    echo
-    exit 1
-fi
+# Print 0 or 1 for the number of complete custom sections.
+# Reject missing partners, reversed markers, or multiple sections.
+hypr_custom_count() {
+    awk '
+        $0 == "--Custom" {
+            if (start || finish) invalid = 1
+            start = NR
+        }
+        $0 == "--End-Custom" {
+            if (!start || finish) invalid = 1
+            finish = NR
+        }
+        END {
+            if (invalid || ((start > 0) != (finish > 0))) exit 1
+            print (start > 0 ? 1 : 0)
+        }
+    ' "$1"
+}
 
-# Check whether the custom section exists in the local bindings file.
-if ! grep -Fxq -- "--Custom" "$BINDINGS_LOCAL_LOCATION" ||
-   ! grep -Fxq -- "--End-Custom" "$BINDINGS_LOCAL_LOCATION"
-then
-    echo "Custom bindings section not found. Adding custom bindings..."
+# Check every pair before this section starts installing files.
+for config_pair in "${HYPRLAND_CONFIGS[@]}"; do
+    repo_file="${config_pair%%;*}"
+    local_file="${config_pair#*;}"
 
-{
-    printf '\n\n'
-    cat "$BINDINGS_REPO_LOCATION"
-} >> "$BINDINGS_LOCAL_LOCATION"
-
-    echo "Custom bindings successfully added to bindings.lua"
-else
-    # Extract the existing local custom section.
-    LOCAL_CUSTOM=$(sed -n '/^--Custom$/,/^--End-Custom$/p' "$BINDINGS_LOCAL_LOCATION")
-
-    # Read the repo custom section.
-    REPO_CUSTOM=$(cat "$BINDINGS_REPO_LOCATION")
-
-    if [[ "$LOCAL_CUSTOM" == "$REPO_CUSTOM" ]]; then
-        echo "Custom bindings are already up to date."
-    else
-        echo "Custom bindings have changed in the repository."
-        echo "Updating the local custom bindings section..."
-
-        TEMP_FILE=$(mktemp)
-
-        # Keep everything before --Custom.
-        sed '/^--Custom$/q' "$BINDINGS_LOCAL_LOCATION" | sed '$d' > "$TEMP_FILE"
-
-        # Add the updated custom section from the repo.
-        cat "$BINDINGS_REPO_LOCATION" >> "$TEMP_FILE"
-
-        # Keep everything after --End-Custom.
-        sed -n '/^--End-Custom$/,$p' "$BINDINGS_LOCAL_LOCATION" | sed '1d' >> "$TEMP_FILE"
-
-        if cp "$TEMP_FILE" "$BINDINGS_LOCAL_LOCATION"; then
-            echo "Custom bindings successfully updated."
-        else
-            echo "ERROR: Failed to update custom bindings."
-            rm -f "$TEMP_FILE"
-            exit 1
-        fi
-
-        rm -f "$TEMP_FILE"
+    if [[ ! -f "$repo_file" || ! -r "$repo_file" ]]; then
+        echo "ERROR: Repository file missing or unreadable: $repo_file" >&2
+        exit 1
     fi
-fi
 
+    if [[ ! -f "$local_file" || ! -r "$local_file" || ! -w "$local_file" ]]; then
+        echo "ERROR: Local file missing, unreadable, or unwritable: $local_file" >&2
+        echo "Allow Omarchy to generate it before installing custom configuration." >&2
+        exit 1
+    fi
+
+    if ! repo_count=$(hypr_custom_count "$repo_file") ||
+       [[ "$repo_count" != 1 ]]; then
+        echo "ERROR: Expected one --Custom / --End-Custom section in $repo_file" >&2
+        exit 1
+    fi
+
+    if ! hypr_custom_count "$local_file" >/dev/null; then
+        echo "ERROR: Incomplete, reversed, or duplicate custom markers in $local_file" >&2
+        exit 1
+    fi
+done
+
+for config_pair in "${HYPRLAND_CONFIGS[@]}"; do
+    repo_file="${config_pair%%;*}"
+    local_file="${config_pair#*;}"
+    config_name="${local_file##*/}"
+
+    repo_custom=$(sed -n '/^--Custom$/,/^--End-Custom$/p' "$repo_file") || exit 1
+    local_custom=$(sed -n '/^--Custom$/,/^--End-Custom$/p' "$local_file") || exit 1
+
+    if [[ "$local_custom" == "$repo_custom" ]]; then
+        echo "$config_name: custom configuration is already up to date."
+        continue
+    fi
+
+    hypr_temp_file=$(mktemp) || exit 1
+
+    if ! {
+        if [[ -z "$local_custom" ]]; then
+            # No custom section: keep the file and append the new section.
+            cat -- "$local_file" &&
+            printf '\n\n%s\n' "$repo_custom"
+        else
+            # Replace only the marked section, keeping content on both sides.
+            sed '/^--Custom$/,$d' "$local_file" &&
+            printf '%s\n' "$repo_custom" &&
+            sed '1,/^--End-Custom$/d' "$local_file"
+        fi
+    } > "$hypr_temp_file"; then
+        rm -f -- "$hypr_temp_file"
+        echo "ERROR: Failed to prepare $config_name." >&2
+        exit 1
+    fi
+
+    if cp -- "$hypr_temp_file" "$local_file"; then
+        echo "$config_name: custom configuration successfully installed."
+    else
+        rm -f -- "$hypr_temp_file"
+        echo "ERROR: Failed to update $config_name." >&2
+        exit 1
+    fi
+
+    rm -f -- "$hypr_temp_file"
+done
 
 #5. Plugins to add/enable
 PLUGINS_TO_ENABLE=(
