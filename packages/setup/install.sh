@@ -119,6 +119,7 @@ install_other() {
 }
 
 install_all() {
+    echo
     install_packages
     install_aur_packages
     install_other

@@ -98,6 +98,7 @@ do
     fi
 done
 
+echo
 echo "To have aliases in the current shell:"
 echo "source $HOME/.bashrc"
 
