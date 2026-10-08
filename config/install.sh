@@ -112,6 +112,8 @@ LOCAL_GLIDE_TS="$HOME/.config/glide/glide.ts"
 
 mkdir -p "$GLIDE_REPO_LOCATION"
 
+echo
+
 if [[ ! -d "$GLIDE_REPO/.git" ]]; then
 
     echo "Glide config repo not found. Cloning..."
@@ -127,29 +129,34 @@ else
 
     GLIDE_BRANCH="$(git -C "$GLIDE_REPO" branch --show-current)"
 
+    if [[ -z "$GLIDE_BRANCH" ]]; then
+        echo "Failed to determine current Glide config branch."
+        exit 1
+    fi
+
     LOCAL_COMMIT="$(git -C "$GLIDE_REPO" rev-parse HEAD)"
 
-    REMOTE_COMMIT="$(
-        git ls-remote "$GLIDE_REPO" "refs/heads/$GLIDE_BRANCH" |
-        awk '{print $1}'
-    )"
+    echo "Checking Glide config remote..."
 
-    if [[ -z "$REMOTE_COMMIT" ]]; then
+    if ! git -C "$GLIDE_REPO" fetch origin "$GLIDE_BRANCH"; then
         echo "Failed to check Glide config remote."
         exit 1
     fi
 
+    REMOTE_COMMIT="$(
+        git -C "$GLIDE_REPO" rev-parse "origin/$GLIDE_BRANCH"
+    )"
+
     if [[ "$LOCAL_COMMIT" == "$REMOTE_COMMIT" ]]; then
-        echo
         echo "Glide config repo is already up to date."
     else
         echo "Glide config repo has changes. Updating..."
 
-        if git -C "$GLIDE_REPO" fetch origin "$GLIDE_BRANCH" &&
-           git -C "$GLIDE_REPO" merge --ff-only "origin/$GLIDE_BRANCH"; then
+        if git -C "$GLIDE_REPO" merge --ff-only "origin/$GLIDE_BRANCH"; then
             echo "Glide config repo updated successfully."
         else
             echo "Failed to update Glide config repo."
+            echo "Local branch has diverged from origin/$GLIDE_BRANCH."
             exit 1
         fi
     fi
@@ -169,7 +176,6 @@ else
     echo "Glide Configuration File is already up to date"
     echo
 fi
-
 
 #3 XCompose
 XCOMPOSE_REPO_LOCATION="$REPO_ROOT/config/XCompose"
