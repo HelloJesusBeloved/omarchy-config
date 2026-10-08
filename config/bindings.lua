@@ -126,13 +126,10 @@ hl.bind("ALT + K", hl.dsp.send_shortcut({ mods = "", key = "up" }), { repeating 
 hl.bind("ALT + L", hl.dsp.send_shortcut({ mods = "", key = "right" }), { repeating = true })
 
 --Paste 2nd to last clipboard item
-o.bind(
-  "SUPER + ALT + V",
-  "Paste Previous Clipboard",
-  [[ "$HOME/.local/bin/omarchy-paste-previous" ]],
-  { release = true }
-)
+o.bind("SUPER + ALT + V", "Paste Previous Clipboard", [[ "$HOME/.local/bin/omarchy-paste-previous" ]], { release = true })
 
+--Toggle Screensaver
+o.bind("SUPER + CTRL + U", "Toggle Screensaver", "omarchy toggle screensaver")
 
 --B. Apps
 --cliamp = Super + Shift + M
