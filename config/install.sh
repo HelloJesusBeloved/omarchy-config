@@ -302,6 +302,7 @@ done
 #6. Directorys to make
 DIRECTORYS_TO_MAKE=(
 "$HOME/Videos/YouTube/YouTube-dl/"
+"$HOME/MEGA/Sync/Transfer/"
 "$HOME/Code/Projects/"
 "$HOME/Pictures/"{Wallpapers,Screenshots}
 "$HOME/Downloads/"{Applications/{Apps,Bootable},Backups}
@@ -325,6 +326,7 @@ done
 #7. Mega Syncs to add
 MEGA_SYNCS_TO_ADD=(
     "$HOME/Videos/YouTube/YouTube-dl/;/Videos/YouTube/YouTube-dl"
+    "$HOME/MEGA/Sync/Transfer/;/Sections/Computers/Transfer/"
 )
 
 if ! command -v mega-cmd &>/dev/null; then
