@@ -14,37 +14,66 @@ do
 done
 
 
+# Read package names from a list file (skipping blank lines and comments).
+list_packages() {
+    local list_file="$1"
+    local package
+
+    while IFS= read -r package || [[ -n "$package" ]]; do
+        [[ -z "$package" || "$package" == \#* ]] && continue
+        echo "$package"
+    done < "$list_file"
+}
+
 remove_packages() {
-    local packages
+    local PACKAGE_LIST="$REPO_ROOT/packages/lists/remove.txt"
 
-    packages=$(
-        pacman -Qq |
-        grep -Fx -f "$REPO_ROOT/packages/lists/remove.txt" || true
-    )
-
-    if [[ -z "$packages" ]]; then
-        echo "No packages to remove."
+    if [[ ! -s "$PACKAGE_LIST" ]]; then
         return
     fi
 
-    printf '%s\n' "$packages" |
-        sudo pacman -Rns --noconfirm -
+    local PACKAGES_TO_REMOVE=()
+    local package
+
+    while IFS= read -r package || [[ -n "$package" ]]; do
+        # Skip blank lines and comments.
+        [[ -z "$package" || "$package" == \#* ]] && continue
+
+        if omarchy-pkg-present "$package"; then
+            PACKAGES_TO_REMOVE+=("$package")
+        fi
+    done < "$PACKAGE_LIST"
+
+    if [[ ${#PACKAGES_TO_REMOVE[@]} -eq 0 ]]; then
+        echo "No packages to remove"
+        return
+    fi
+
+    echo "Packages to remove:"
+    printf '  %s\n' "${PACKAGES_TO_REMOVE[@]}"
+    echo
+
+    # Omarchy's approved way to remove packages: also removes configs
+    # and unneeded dependencies.
+    omarchy pkg drop "${PACKAGES_TO_REMOVE[@]}"
 }
 
 remove_aur_packages() {
-    local packages
+    local -a packages
 
-    packages=$(
+    # AUR packages have no Omarchy equivalent, so they are still
+    # removed with yay (shipped by Omarchy).
+    mapfile -t packages < <(
         pacman -Qqm |
         grep -Fx -f "$REPO_ROOT/packages/lists/remove-aur.txt" || true
     )
 
-    if [[ -z "$packages" ]]; then
+    if [[ ${#packages[@]} -eq 0 ]]; then
         echo "No AUR packages to remove."
         return
     fi
 
-    printf '%s\n' "$packages" |
+    printf '%s\n' "${packages[@]}" |
         yay -Rns --noconfirm -
 }
 

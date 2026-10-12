@@ -30,7 +30,7 @@ install_packages() {
         # Skip blank lines and comments.
         [[ -z "$package" || "$package" == \#* ]] && continue
 
-        if ! pacman -Q "$package" &>/dev/null; then
+        if ! omarchy-pkg-present "$package"; then
             PACKAGES_TO_INSTALL+=("$package")
         fi
     done < "$PACKAGE_LIST"
@@ -44,7 +44,9 @@ install_packages() {
     printf '  %s\n' "${PACKAGES_TO_INSTALL[@]}"
     echo
 
-    sudo pacman -Sy --needed --noconfirm "${PACKAGES_TO_INSTALL[@]}"
+    # Omarchy's approved way to add packages: installs only what is
+    # missing and verifies each one was actually installed.
+    omarchy pkg add "${PACKAGES_TO_INSTALL[@]}"
 }
 
 install_aur_packages() {
@@ -61,7 +63,7 @@ install_aur_packages() {
         # Skip blank lines and comments.
         [[ -z "$package" || "$package" == \#* ]] && continue
 
-        if ! pacman -Q "$package" &>/dev/null; then
+        if ! omarchy-pkg-present "$package"; then
             PACKAGES_TO_INSTALL+=("$package")
         fi
     done < "$PACKAGE_LIST"
@@ -75,15 +77,20 @@ install_aur_packages() {
     printf '  %s\n' "${PACKAGES_TO_INSTALL[@]}"
     echo
 
+    # "omarchy pkg add" only covers the official Arch repos, so AUR
+    # packages are still installed with yay (shipped by Omarchy).
     yay -S --needed --noconfirm "${PACKAGES_TO_INSTALL[@]}"
 }
 
 install_mega() {
-    if pacman -Q megacmd &>/dev/null; then
+    if omarchy-pkg-present megacmd; then
         echo "MEGAcmd is already installed."
         return
     fi
 
+    # MEGAcmd comes from MEGA's own .pkg file, which "omarchy pkg add"
+    # cannot install (it takes repo package names), so this is the one
+    # place that still uses pacman directly.
     curl -fsSL -o /tmp/megacmd.pkg.tar.zst \
         https://mega.nz/linux/repo/Arch_Extra/x86_64/megacmd-x86_64.pkg.tar.zst
 
@@ -94,7 +101,7 @@ install_mega() {
 }
 
 install_tailscale() {
-    if command -v tailscale &>/dev/null; then
+    if omarchy-pkg-present tailscale; then
         echo "Tailscale is already installed."
         return
     fi
@@ -104,7 +111,7 @@ install_tailscale() {
 
 
 install_signal() {
-    if command -v signal-desktop &>/dev/null; then
+    if omarchy-pkg-present signal-desktop; then
         echo "Signal is already installed."
         return
     fi
