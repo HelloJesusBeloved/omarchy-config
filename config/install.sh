@@ -332,28 +332,106 @@ MEGA_SYNCS_TO_ADD=(
 if ! command -v mega-cmd &>/dev/null; then
     echo
     echo "mega-cmd is not installed. Please install it before configuring MEGA Sync."
+elif mega-whoami 2>&1 | grep -Fq "Not logged in."; then
+    echo
+    echo "MEGA account is not logged in. Please run 'mega-login' first."
 else
-    if mega-whoami 2>&1 | grep -Fq "Not logged in."; then
-        echo
-        echo "MEGA account is not logged in. Please run 'mega-login' first."
-    else
-        echo
-        for sync in "${MEGA_SYNCS_TO_ADD[@]}"
-        do
-            LOCAL_PATH="${sync%%;*}"
-            REMOTE_PATH="${sync#*;}"
+    echo
 
-            if mega-sync "$LOCAL_PATH" &>/dev/null; then
-                echo "MEGA Sync already configured: $LOCAL_PATH -> $REMOTE_PATH"
+    for sync in "${MEGA_SYNCS_TO_ADD[@]}"; do
+        LOCAL_PATH="${sync%%;*}"
+        REMOTE_PATH="${sync#*;}"
+
+        # Read sync state using predictable, delimited output.
+        if ! SYNC_LIST="$(
+            mega-sync \
+                --output-cols=LOCALPATH,REMOTEPATH,RUN_STATE \
+                --col-separator='|'
+        )"; then
+            echo "Could not check MEGA Sync status: $LOCAL_PATH"
+            continue
+        fi
+
+        # Match both paths, ignoring trailing slashes.
+        if SYNC_STATE="$(
+            awk -F '|' \
+                -v local_path="$LOCAL_PATH" \
+                -v remote_path="$REMOTE_PATH" '
+                function trim(path) {
+                    sub(/^[[:space:]]+/, "", path)
+                    sub(/[[:space:]]+$/, "", path)
+                    return path
+                }
+
+                function normalize(path) {
+                    path = trim(path)
+                    if (path != "/") {
+                        sub(/\/+$/, "", path)
+                    }
+                    return path
+                }
+
+                NR == 1 { next }
+
+                {
+                    current_local = normalize($1)
+                    current_remote = normalize($2)
+                    state = trim($3)
+
+                    if (current_local == normalize(local_path)) {
+                        if (current_remote == normalize(remote_path)) {
+                            print state
+                        } else {
+                            print "REMOTE_MISMATCH"
+                        }
+
+                        found = 1
+                        exit
+                    }
+                }
+
+                END {
+                    if (!found) {
+                        exit 1
+                    }
+                }
+            ' <<< "$SYNC_LIST"
+        )"; then
+            case "$SYNC_STATE" in
+                Running|Pending|Loading)
+                    echo "MEGA Sync already enabled: $LOCAL_PATH -> $REMOTE_PATH"
+                    ;;
+
+                Suspended|Disabled)
+                    echo "MEGA Sync is disabled. Re-enabling: $LOCAL_PATH -> $REMOTE_PATH"
+
+                    if mega-sync --enable "$LOCAL_PATH"; then
+                        echo "MEGA Sync successfully re-enabled: $LOCAL_PATH -> $REMOTE_PATH"
+                    else
+                        echo "MEGA Sync could not be re-enabled: $LOCAL_PATH -> $REMOTE_PATH"
+                    fi
+                    ;;
+
+                REMOTE_MISMATCH)
+                    echo "MEGA Sync local path exists with a different remote path:"
+                    echo "  Local:  $LOCAL_PATH"
+                    echo "  Wanted: $REMOTE_PATH"
+                    echo "Skipping to avoid changing the existing sync."
+                    ;;
+
+                *)
+                    echo "Unrecognized MEGA Sync state '$SYNC_STATE': $LOCAL_PATH"
+                    echo "Skipping to avoid changing the existing sync."
+                    ;;
+            esac
+        else
+            echo "MEGA Sync not configured: $LOCAL_PATH -> $REMOTE_PATH"
+
+            if mega-sync "$LOCAL_PATH" "$REMOTE_PATH"; then
+                echo "MEGA Sync successfully added: $LOCAL_PATH -> $REMOTE_PATH"
             else
-                echo "MEGA Sync not configured: $LOCAL_PATH -> $REMOTE_PATH"
-
-                if mega-sync "$LOCAL_PATH" "$REMOTE_PATH"; then
-                    echo "MEGA Sync successfully added: $LOCAL_PATH -> $REMOTE_PATH"
-                else
-                    echo "MEGA Sync could not be added: $LOCAL_PATH -> $REMOTE_PATH"
-                fi
+                echo "MEGA Sync could not be added: $LOCAL_PATH -> $REMOTE_PATH"
             fi
-        done
-    fi
+        fi
+    done
 fi
