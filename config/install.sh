@@ -337,16 +337,15 @@ else
         echo
         echo "MEGA account is not logged in. Please run 'mega-login' first."
     else
+        echo
         for sync in "${MEGA_SYNCS_TO_ADD[@]}"
         do
             LOCAL_PATH="${sync%%;*}"
             REMOTE_PATH="${sync#*;}"
 
             if mega-sync "$LOCAL_PATH" &>/dev/null; then
-                echo
                 echo "MEGA Sync already configured: $LOCAL_PATH -> $REMOTE_PATH"
             else
-                echo
                 echo "MEGA Sync not configured: $LOCAL_PATH -> $REMOTE_PATH"
 
                 if mega-sync "$LOCAL_PATH" "$REMOTE_PATH"; then
