@@ -24,6 +24,10 @@ local SUPER_SHIFT = {
   "D",
   "B",
   "C",
+  "LEFT",
+  "RIGHT",
+  "UP",
+  "DOWN",
 }
 
 for _, key in ipairs(SUPER_SHIFT) do
@@ -91,6 +95,11 @@ o.bind("SUPER + J", "Focus window down", hl.dsp.focus({ direction = "d" }))
 o.bind("SUPER + K", "Focus window down", hl.dsp.focus({ direction = "u" }))
 o.bind("SUPER + L", "Focus window down", hl.dsp.focus({ direction = "r" }))
 o.bind("SUPER + H", "Focus window down", hl.dsp.focus({ direction = "l" }))
+
+o.bind("SUPER + SHIFT + H", "Swap window left", function() hl.dispatch(hl.dsp.window.swap({ direction = "left" })) end)
+o.bind("SUPER + SHIFT + J", "Swap window down", function() hl.dispatch(hl.dsp.window.swap({ direction = "down" })) end)
+o.bind("SUPER + SHIFT + K", "Swap window up", function() hl.dispatch(hl.dsp.window.swap({ direction = "up" })) end)
+o.bind("SUPER + SHIFT + L", "Swap window right", function() hl.dispatch(hl.dsp.window.swap({ direction = "right" })) end)
 
 --Show Keybindings
 o.bind("SUPER + CTRL + K", "Show Keybindings", "omarchy menu keybindings")
