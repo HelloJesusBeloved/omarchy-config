@@ -7,6 +7,7 @@ local SUPER = {
   "L",
   "J",
   "K",
+  "TAB",
 }
 
 for _, key in ipairs(SUPER) do
@@ -139,6 +140,87 @@ o.bind("SUPER + ALT + V", "Paste Previous Clipboard", [[ "$HOME/.local/bin/omarc
 
 --Toggle Screensaver
 o.bind("SUPER + CTRL + U", "Toggle Screensaver", "omarchy toggle screensaver")
+
+-- Super+Tab: cycle through recently used workspaces.
+local workspace_history = {}
+local workspace_cycle = nil
+
+local function active_id()
+  local ws = hl.get_active_workspace()
+  return ws and not ws.special and ws.id and ws.id > 0 and ws.id or nil
+end
+
+local function remember(id)
+  if not id or workspace_history[1] == id then return end
+
+  for i = #workspace_history, 1, -1 do
+    if workspace_history[i] == id then
+      table.remove(workspace_history, i)
+    end
+  end
+  table.insert(workspace_history, 1, id)
+end
+
+hl.on("workspace.active", function(ws)
+  if workspace_cycle or not ws or ws.special or not ws.id then return end
+
+  local monitor = hl.get_active_monitor()
+  if monitor and ws.monitor and ws.monitor.name == monitor.name then
+    remember(ws.id)
+  end
+end)
+
+hl.on("monitor.focused", function()
+  if not workspace_cycle then remember(active_id()) end
+end)
+
+-- Commit the selected workspace when either Super key is released.
+hl.on("input.keyboard.key", function(keycode, _, state)
+  if state == 0 and (keycode == 133 or keycode == 134) and workspace_cycle then
+    workspace_cycle = nil
+    remember(active_id())
+  end
+end)
+
+o.bind("SUPER + TAB", "Cycle recent workspaces", function()
+  local current = active_id()
+  if not current then return end
+
+  if not workspace_cycle then
+    remember(current)
+
+    local order = {}
+    for i, id in ipairs(workspace_history) do
+      order[i] = id
+    end
+    workspace_cycle = { order = order, position = 1 }
+  end
+
+  local order = workspace_cycle.order
+
+  -- On first use, ask Hyprland for the previous workspace.
+  if #order == 1 then
+    hl.dispatch(hl.dsp.focus({ workspace = "previous" }))
+    local selected = active_id()
+
+    if selected and selected ~= current then
+      order[2] = selected
+      workspace_cycle.position = 2
+    else
+      workspace_cycle = nil
+    end
+    return
+  end
+
+  local next_position = workspace_cycle.position % #order + 1
+  local target = order[next_position]
+
+  hl.dispatch(hl.dsp.focus({ workspace = tostring(target) }))
+  if active_id() == target then
+    workspace_cycle.position = next_position
+  end
+end)
+
 
 --B. Apps
 --cliamp = Super + Shift + M
