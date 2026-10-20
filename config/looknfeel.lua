@@ -11,5 +11,9 @@
      },
    })
 
+--Disable animations for fullscreen windows only
+--Makes swapping windows with ALT + TAB instant instead of animated
+hl.window_rule({ match = { fullscreen = true }, no_anim = true })
+
 
 --End-Custom
