@@ -20,11 +20,9 @@ end
 local SUPER_SHIFT = {
   "M",
   "N",
-  "A",
   "S",
   "G",
   "D",
-  "B",
   "C",
   "LEFT",
   "RIGHT",
@@ -573,14 +571,8 @@ o.bind("SUPER + ALT + F", "Full width or stack browser", show_callback_errors(fu
 --cliamp = Super + Shift + M
 o.bind("SUPER + SHIFT + M", "Music TUI", "omarchy launch or focus tui cliamp")
 
---Signal = Super + Shift + A
-o.bind("SUPER + SHIFT + A", "Signal", "omarchy launch signal")
-
 --Discord = Super + Shift + D
 o.bind("SUPER + SHIFT + D", "Discord", "omarchy launch discord community")
-
---BlueBubbles = Super + Shift + B
-o.bind("SUPER + SHIFT + B", "BlueBubbles", "bluebubbles")
 
 --mpv gui fullscreen = Super + Shift + V
 --mpv gui fullscreen WC = Super + Shift + Alt + V

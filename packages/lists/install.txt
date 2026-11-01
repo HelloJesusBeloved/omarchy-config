@@ -3,3 +3,7 @@ cmatrix
 remmina
 libvncserver
 prismlauncher
+firefox
+libratbag
+piper
+flatpak

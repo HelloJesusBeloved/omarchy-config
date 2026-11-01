@@ -121,8 +121,6 @@ install_signal() {
 
 install_other() {
     install_mega
-    install_tailscale
-    install_signal
 }
 
 install_all() {

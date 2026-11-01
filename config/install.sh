@@ -103,80 +103,6 @@ echo "To have aliases in the current shell:"
 echo "source $HOME/.bashrc"
 
 
-#2. Glide.ts
-GLIDE_REPO_LOCATION="$HOME/Code/Projects/Prod"
-GLIDE_REPO="$GLIDE_REPO_LOCATION/glide-config"
-
-REPO_GLIDE_TS="$GLIDE_REPO/glide.ts"
-LOCAL_GLIDE_TS="$HOME/.config/glide/glide.ts"
-
-mkdir -p "$GLIDE_REPO_LOCATION"
-
-echo
-
-if [[ ! -d "$GLIDE_REPO/.git" ]]; then
-
-    echo "Glide config repo not found. Cloning..."
-
-    if git clone "https://git.nerdvpn.de/HelloJesusBeloved/glide-config" "$GLIDE_REPO"; then
-        echo "Glide config repo cloned successfully."
-    else
-        echo "Failed to clone Glide config repo."
-        exit 1
-    fi
-
-else
-
-    GLIDE_BRANCH="$(git -C "$GLIDE_REPO" branch --show-current)"
-
-    if [[ -z "$GLIDE_BRANCH" ]]; then
-        echo "Failed to determine current Glide config branch."
-        exit 1
-    fi
-
-    LOCAL_COMMIT="$(git -C "$GLIDE_REPO" rev-parse HEAD)"
-
-    echo "Checking Glide config remote..."
-
-    if ! git -C "$GLIDE_REPO" fetch origin "$GLIDE_BRANCH"; then
-        echo "Failed to check Glide config remote."
-        exit 1
-    fi
-
-    REMOTE_COMMIT="$(
-        git -C "$GLIDE_REPO" rev-parse "origin/$GLIDE_BRANCH"
-    )"
-
-    if [[ "$LOCAL_COMMIT" == "$REMOTE_COMMIT" ]]; then
-        echo "Glide config repo is already up to date."
-    else
-        echo "Glide config repo has changes. Updating..."
-
-        if git -C "$GLIDE_REPO" merge --ff-only "origin/$GLIDE_BRANCH"; then
-            echo "Glide config repo updated successfully."
-        else
-            echo "Failed to update Glide config repo."
-            echo "Local branch has diverged from origin/$GLIDE_BRANCH."
-            exit 1
-        fi
-    fi
-
-fi
-
-if ! cmp -s "$LOCAL_GLIDE_TS" "$REPO_GLIDE_TS"; then
-    if cp "$REPO_GLIDE_TS" "$LOCAL_GLIDE_TS"; then
-        echo "Glide Configuration File Updated Successfully"
-        echo
-    else
-        echo "Failed to Update (cp) Glide Configuration File"
-        echo "Please make sure that you have initialized your glide config from inside Glide Browser"
-        echo
-    fi
-else
-    echo "Glide Configuration File is already up to date"
-    echo
-fi
-
 #3 XCompose
 XCOMPOSE_REPO_LOCATION="$REPO_ROOT/config/XCompose"
 XCOMPOSE_LOCAL_LOCATION="$HOME/.XCompose"
@@ -301,11 +227,10 @@ done
 
 #6. Directorys to make
 DIRECTORYS_TO_MAKE=(
-"$HOME/Videos/YouTube/YouTube-dl/"
-"$HOME/MEGA/Sync/Transfer/"
-"$HOME/Code/Projects/"
-"$HOME/Pictures/"{Wallpapers,Screenshots}
-"$HOME/Downloads/"{Applications/{Apps,Bootable},Backups}
+$HOME/Code/Projects/
+$HOME/Pictures/Wallpapers/
+$HOME/Downloads/Backups/
+$HOME/MEGA/Transfer/
 )
 
 for dir in "${DIRECTORYS_TO_MAKE[@]}"
@@ -325,8 +250,9 @@ done
 
 #7. Mega Syncs to add
 MEGA_SYNCS_TO_ADD=(
-    "$HOME/Videos/YouTube/YouTube-dl/;/Videos/YouTube/YouTube-dl"
-    "$HOME/MEGA/Sync/Transfer/;/Sections/Computers/Transfer/"
+"$HOME/MEGA/M-MEGA;/mjolnir"
+"$HOME/MEGA/iMac/;/iMac"
+"$HOME/MEGA/Transfer/;/Transfer"
 )
 
 if ! command -v mega-cmd &>/dev/null; then
